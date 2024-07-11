@@ -1,6 +1,6 @@
 # Minesweeper
 
-This is a text-based version of Minesweeper.
+This is a text-based version of Minesweeper. (Not my code btw)
 
 ## Source:
 https://www.askpython.com/python/examples/create-minesweeper-using-python
