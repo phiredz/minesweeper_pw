@@ -1,4 +1,4 @@
-# Minesweeper
+# Minesweeper 🚩
 
 ## Source
 https://github.com/ixora-0/Minesweeper
