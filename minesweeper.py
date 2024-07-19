@@ -1,340 +1,248 @@
-# Importing packages
+import pygame
 import random
-import os
+pygame.init()
 
-# Printing the Minesweeper Layout
-def print_mines_layout():
+bg_color = (192, 192, 192)
+grid_color = (128, 128, 128)
 
-	global mine_values
-	global n
+game_width = 10  # Change this to increase size
+game_height = 10  # Change this to increase size
+numMine = 9  # Number of mines
+grid_size = 32  # Size of grid (WARNING: macke sure to change the images dimension as well)
+border = 16  # Top border
+top_border = 100  # Left, Right, Bottom border
+display_width = grid_size * game_width + border * 2  # Display width
+display_height = grid_size * game_height + border + top_border  # Display height
+gameDisplay = pygame.display.set_mode((display_width, display_height))  # Create display
+timer = pygame.time.Clock()  # Create timer
+pygame.display.set_caption("Minesweeper")  # S Set the caption of window
 
-	print()
-	print("\t\t\tMINESWEEPER\n")
-
-	st = "   "
-	for i in range(n):
-		st = st + "     " + str(i + 1)
-	print(st)	
-
-	for r in range(n):
-		st = "     "
-		if r == 0:
-			for col in range(n):
-				st = st + "______"	
-			print(st)
-
-		st = "     "
-		for col in range(n):
-			st = st + "|     "
-		print(st + "|")
-		
-		st = "  " + str(r + 1) + "  "
-		for col in range(n):
-			st = st + "|  " + str(mine_values[r][col]) + "  "
-		print(st + "|")	
-
-		st = "     "
-		for col in range(n):
-			st = st + "|_____"
-		print(st + '|')
-
-	print()
- 
-# Function for setting up Mines
-def set_mines():
-
-	global numbers
-	global mines_no
-	global n
-
-	# Track of number of mines already set up
-	count = 0
-	while count < mines_no:
-
-		# Random number from all possible grid positions 
-		val = random.randint(0, n*n-1)
-
-		# Generating row and column from the number
-		r = val // n
-		col = val % n
-
-		# Place the mine, if it doesn't already have one
-		if numbers[r][col] != -1:
-			count = count + 1
-			numbers[r][col] = -1
-
-# Function for setting up the other grid values
-def set_values():
-
-	global numbers
-	global n
-
-	# Loop for counting each cell value
-	for r in range(n):
-		for col in range(n):
-
-			# Skip, if it contains a mine
-			if numbers[r][col] == -1:
-				continue
-
-			# Check up	
-			if r > 0 and numbers[r-1][col] == -1:
-				numbers[r][col] = numbers[r][col] + 1
-			# Check down	
-			if r < n-1  and numbers[r+1][col] == -1:
-				numbers[r][col] = numbers[r][col] + 1
-			# Check left
-			if col > 0 and numbers[r][col-1] == -1:
-				numbers[r][col] = numbers[r][col] + 1
-			# Check right
-			if col < n-1 and numbers[r][col+1] == -1:
-				numbers[r][col] = numbers[r][col] + 1
-			# Check top-left	
-			if r > 0 and col > 0 and numbers[r-1][col-1] == -1:
-				numbers[r][col] = numbers[r][col] + 1
-			# Check top-right
-			if r > 0 and col < n-1 and numbers[r-1][col+1] == -1:
-				numbers[r][col] = numbers[r][col] + 1
-			# Check below-left	
-			if r < n-1 and col > 0 and numbers[r+1][col-1] == -1:
-				numbers[r][col] = numbers[r][col] + 1
-			# Check below-right
-			if r < n-1 and col < n-1 and numbers[r+1][col+1] == -1:
-				numbers[r][col] = numbers[r][col] + 1
-
-# Recursive function to display all zero-valued neighbours	
-def neighbours(r, col):
-	
-	global mine_values
-	global numbers
-	global vis
-
-	# If the cell already not visited
-	if [r,col] not in vis:
-
-		# Mark the cell visited
-		vis.append([r,col])
-
-		# If the cell is zero-valued
-		if numbers[r][col] == 0:
-
-			# Display it to the user
-			mine_values[r][col] = numbers[r][col]
-
-			# Recursive calls for the neighbouring cells
-			if r > 0:
-				neighbours(r-1, col)
-			if r < n-1:
-				neighbours(r+1, col)
-			if col > 0:
-				neighbours(r, col-1)
-			if col < n-1:
-				neighbours(r, col+1)	
-			if r > 0 and col > 0:
-				neighbours(r-1, col-1)
-			if r > 0 and col < n-1:
-				neighbours(r-1, col+1)
-			if r < n-1 and col > 0:
-				neighbours(r+1, col-1)
-			if r < n-1 and col < n-1:
-				neighbours(r+1, col+1)	
-
-		# If the cell is not zero-valued 			
-		if numbers[r][col] != 0:
-				mine_values[r][col] = numbers[r][col]
-
-# Function for clearing the terminal
-def clear():
-	os.system("clear")		
-
-# Function to display the instructions
-def instructions():
-	print("Instructions:")
-	print("1. Enter row and column number to select a cell, Example \"2 3\"")
-	print("2. In order to flag a mine, enter F after row and column numbers, Example \"2 3 F\"")
-
-# Function to check for completion of the game
-def check_over():
-	global mine_values
-	global n
-	global mines_no
-
-	# Count of all numbered values
-	count = 0
-
-	# Loop for checking each cell in the grid
-	for r in range(n):
-		for col in range(n):
-
-			# If cell not empty or flagged
-			if mine_values[r][col] != ' ' and mine_values[r][col] != 'F':
-				count = count + 1
-	
-	# Count comparison 			
-	if count == n * n - mines_no:
-		return True
-	else:
-		return False
-
-# Display all the mine locations					
-def show_mines():
-	global mine_values
-	global numbers
-	global n
-
-	for r in range(n):
-		for col in range(n):
-			if numbers[r][col] == -1:
-				mine_values[r][col] = 'M'
+# Import files
+spr_emptyGrid = pygame.image.load("Sprites/empty.png")
+spr_flag = pygame.image.load("Sprites/flag.png")
+spr_grid = pygame.image.load("Sprites/Grid.png")
+spr_grid1 = pygame.image.load("Sprites/grid1.png")
+spr_grid2 = pygame.image.load("Sprites/grid2.png")
+spr_grid3 = pygame.image.load("Sprites/grid3.png")
+spr_grid4 = pygame.image.load("Sprites/grid4.png")
+spr_grid5 = pygame.image.load("Sprites/grid5.png")
+spr_grid6 = pygame.image.load("Sprites/grid6.png")
+spr_grid7 = pygame.image.load("Sprites/grid7.png")
+spr_grid8 = pygame.image.load("Sprites/grid8.png")
+spr_grid7 = pygame.image.load("Sprites/grid7.png")
+spr_mine = pygame.image.load("Sprites/mine.png")
+spr_mineClicked = pygame.image.load("Sprites/mineClicked.png")
+spr_mineFalse = pygame.image.load("Sprites/mineFalse.png")
 
 
-if __name__ == "__main__":
+# Create global values
+grid = []  # The main grid
+mines = []  # Pos of the mines
 
-	# Size of grid
-	n = 8
-	# Number of mines
-	mines_no = 8
 
-	# The actual values of the grid
-	numbers = [[0 for y in range(n)] for x in range(n)] 
-	# The apparent values of the grid
-	mine_values = [[' ' for y in range(n)] for x in range(n)]
-	# The positions that have been flagged
-	flags = []
+# Create funtion to draw texts
+def drawText(txt, s, yOff=0):
+    screen_text = pygame.font.SysFont("Calibri", s, True).render(txt, True, (0, 0, 0))
+    rect = screen_text.get_rect()
+    rect.center = (game_width * grid_size / 2 + border, game_height * grid_size / 2 + top_border + yOff)
+    gameDisplay.blit(screen_text, rect)
 
-	# Set the mines
-	set_mines()
 
-	# Set the values
-	set_values()
+# Create class grid
+class Grid:
+    def __init__(self, xGrid, yGrid, type):
+        self.xGrid = xGrid  # X pos of grid
+        self.yGrid = yGrid  # Y pos of grid
+        self.clicked = False  # Boolean var to check if the grid has been clicked
+        self.mineClicked = False  # Bool var to check if the grid is clicked and its a mine
+        self.mineFalse = False  # Bool var to check if the player flagged the wrong grid
+        self.flag = False  # Bool var to check if player flagged the grid
+        # Create rectObject to handle drawing and collisions
+        self.rect = pygame.Rect(border + self.xGrid * grid_size, top_border + self.yGrid * grid_size, grid_size, grid_size)
+        self.val = type  # Value of the grid, -1 is mine
 
-	# Display the instructions
-	instructions()
+    def drawGrid(self):
+        # Draw the grid according to bool variables and value of grid
+        if self.mineFalse:
+            gameDisplay.blit(spr_mineFalse, self.rect)
+        else:
+            if self.clicked:
+                if self.val == -1:
+                    if self.mineClicked:
+                        gameDisplay.blit(spr_mineClicked, self.rect)
+                    else:
+                        gameDisplay.blit(spr_mine, self.rect)
+                else:
+                    if self.val == 0:
+                        gameDisplay.blit(spr_emptyGrid, self.rect)
+                    elif self.val == 1:
+                        gameDisplay.blit(spr_grid1, self.rect)
+                    elif self.val == 2:
+                        gameDisplay.blit(spr_grid2, self.rect)
+                    elif self.val == 3:
+                        gameDisplay.blit(spr_grid3, self.rect)
+                    elif self.val == 4:
+                        gameDisplay.blit(spr_grid4, self.rect)
+                    elif self.val == 5:
+                        gameDisplay.blit(spr_grid5, self.rect)
+                    elif self.val == 6:
+                        gameDisplay.blit(spr_grid6, self.rect)
+                    elif self.val == 7:
+                        gameDisplay.blit(spr_grid7, self.rect)
+                    elif self.val == 8:
+                        gameDisplay.blit(spr_grid8, self.rect)
 
-	# Variable for maintaining Game Loop
-	over = False
-		
-	# The GAME LOOP	
-	while not over:
-		print_mines_layout()
+            else:
+                if self.flag:
+                    gameDisplay.blit(spr_flag, self.rect)
+                else:
+                    gameDisplay.blit(spr_grid, self.rect)
 
-		# Input from the user
-		inp = input("Enter row number followed by space and column number = ").split()
-		
-		# Standard input
-		if len(inp) == 2:
+    def revealGrid(self):
+        self.clicked = True
+        # Auto reveal if it's a 0
+        if self.val == 0:
+            for x in range(-1, 2):
+                if self.xGrid + x >= 0 and self.xGrid + x < game_width:
+                    for y in range(-1, 2):
+                        if self.yGrid + y >= 0 and self.yGrid + y < game_height:
+                            if not grid[self.yGrid + y][self.xGrid + x].clicked:
+                                grid[self.yGrid + y][self.xGrid + x].revealGrid()
+        elif self.val == -1:
+            # Auto reveal all mines if it's a mine
+            for m in mines:
+                if not grid[m[1]][m[0]].clicked:
+                    grid[m[1]][m[0]].revealGrid()
 
-			# Try block to handle errant input
-			try: 
-				val = list(map(int, inp))
-			except ValueError:
-				clear()
-				print("Wrong input!")
-				instructions()
-				continue
+    def updateValue(self):
+        # Update the value when all grid is generated
+        if self.val != -1:
+            for x in range(-1, 2):
+                if self.xGrid + x >= 0 and self.xGrid + x < game_width:
+                    for y in range(-1, 2):
+                        if self.yGrid + y >= 0 and self.yGrid + y < game_height:
+                            if grid[self.yGrid + y][self.xGrid + x].val == -1:
+                                self.val += 1
 
-		# Flag input
-		elif len(inp) == 3:
-			if inp[2] != 'F' and inp[2] != 'f':
-				clear()
-				print("Wrong Input!")
-				instructions()
-				continue
 
-			# Try block to handle errant input	
-			try:
-				val = list(map(int, inp[:2]))
-			except ValueError:
-				clear()
-				print("Wrong input!")
-				instructions()
-				continue
+def gameLoop():
+    gameState = "Playing"  # Game state
+    mineLeft = numMine  # Number of mine left
+    global grid  # Access global var
+    grid = []
+    global mines
+    t = 0  # Set time to 0
 
-			# Sanity checks	
-			if val[0] > n or val[0] < 1 or val[1] > n or val[1] < 1:
-				clear()
-				print("Wrong input!")
-				instructions()
-				continue
+    # Generating mines
+    mines = [[random.randrange(0, game_width),
+              random.randrange(0, game_height)]]
 
-			# Get row and column numbers
-			r = val[0]-1
-			col = val[1]-1	
+    for c in range(numMine - 1):
+        pos = [random.randrange(0, game_width),
+               random.randrange(0, game_height)]
+        same = True
+        while same:
+            for i in range(len(mines)):
+                if pos == mines[i]:
+                    pos = [random.randrange(0, game_width), random.randrange(0, game_height)]
+                    break
+                if i == len(mines) - 1:
+                    same = False
+        mines.append(pos)
 
-			# If cell already been flagged
-			if [r, col] in flags:
-				clear()
-				print("Flag already set")
-				continue
+    # Generating entire grid
+    for j in range(game_height):
+        line = []
+        for i in range(game_width):
+            if [i, j] in mines:
+                line.append(Grid(i, j, -1))
+            else:
+                line.append(Grid(i, j, 0))
+        grid.append(line)
 
-			# If cell already been displayed
-			if mine_values[r][col] != ' ':
-				clear()
-				print("Value already known")
-				continue
+    # Update of the grid
+    for i in grid:
+        for j in i:
+            j.updateValue()
 
-			# Check the number for flags 	
-			if len(flags) < mines_no:
-				clear()
-				print("Flag set")
+    # Main Loop
+    while gameState != "Exit":
+        # Reset screen
+        gameDisplay.fill(bg_color)
 
-				# Adding flag to the list
-				flags.append([r, col])
-				
-				# Set the flag for display
-				mine_values[r][col] = 'F'
-				continue
-			else:
-				clear()
-				print("Flags finished")
-				continue	 
+        # User inputs
+        for event in pygame.event.get():
+            # Check if player close window
+            if event.type == pygame.QUIT:
+                gameState = "Exit"
+            # Check if play restart
+            if gameState == "Game Over" or gameState == "Win":
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_r:
+                        gameState = "Exit"
+                        gameLoop()
+            else:
+                if event.type == pygame.MOUSEBUTTONUP:
+                    for i in grid:
+                        for j in i:
+                            if j.rect.collidepoint(event.pos):
+                                if event.button == 1:
+                                    # If player left clicked of the grid
+                                    j.revealGrid()
+                                    # Toggle flag off
+                                    if j.flag:
+                                        mineLeft += 1
+                                        j.falg = False
+                                    # If it's a mine
+                                    if j.val == -1:
+                                        gameState = "Game Over"
+                                        j.mineClicked = True
+                                elif event.button == 3:
+                                    # If the player right clicked
+                                    if not j.clicked:
+                                        if j.flag:
+                                            j.flag = False
+                                            mineLeft += 1
+                                        else:
+                                            j.flag = True
+                                            mineLeft -= 1
 
-		else: 
-			clear()
-			print("Wrong input!")	
-			instructions()
-			continue
-			
+        # Check if won
+        w = True
+        for i in grid:
+            for j in i:
+                j.drawGrid()
+                if j.val != -1 and not j.clicked:
+                    w = False
+        if w and gameState != "Exit":
+            gameState = "Win"
 
-		# Sanity checks
-		if val[0] > n or val[0] < 1 or val[1] > n or val[1] < 1:
-			clear()
-			print("Wrong Input!")
-			instructions()
-			continue
-			
-		# Get row and column number
-		r = val[0]-1
-		col = val[1]-1
+        # Draw Texts
+        if gameState != "Game Over" and gameState != "Win":
+            t += 1
+        elif gameState == "Game Over":
+            drawText("Game Over!", 50)
+            drawText("R to restart", 35, 50)
+            for i in grid:
+                for j in i:
+                    if j.flag and j.val != -1:
+                        j.mineFalse = True
+        else:
+            drawText("You WON!", 50)
+            drawText("R to restart", 35, 50)
+        # Draw time
+        s = str(t // 15)
+        screen_text = pygame.font.SysFont("Calibri", 50).render(s, True, (0, 0, 0))
+        gameDisplay.blit(screen_text, (border, border))
+        # Draw mine left
+        screen_text = pygame.font.SysFont("Calibri", 50).render(mineLeft.__str__(), True, (0, 0, 0))
+        gameDisplay.blit(screen_text, (display_width - border - 50, border))
 
-		# Unflag the cell if already flagged
-		if [r, col] in flags:
-			flags.remove([r, col])
+        pygame.display.update()  # Update screen
 
-		# If landing on a mine --- GAME OVER	
-		if numbers[r][col] == -1:
-			mine_values[r][col] = 'M'
-			show_mines()
-			print_mines_layout()
-			print("Landed on a mine. GAME OVER!!!!!")
-			over = True
-			continue
+        timer.tick(15)  # Tick fps
 
-		# If landing on a cell with 0 mines in neighboring cells
-		elif numbers[r][col] == 0:
-			vis = []
-			mine_values[r][col] = '0'
-			neighbours(r, col)
 
-		# If selecting a cell with atleast 1 mine in neighboring cells	
-		else:	
-			mine_values[r][col] = numbers[r][col]
-
-		# Check for game completion	
-		if(check_over()):
-			show_mines()
-			print_mines_layout()
-			print("Congratulations!!! YOU WIN")
-			over = True
-			continue
-		clear()	
+gameLoop()
+pygame.quit()
+quit()
