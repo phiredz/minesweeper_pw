@@ -1,3 +1,5 @@
+# Modified code with BGM & SFX
+
 import pygame
 import random
 pygame.init()
@@ -16,6 +18,15 @@ display_height = grid_size * game_height + border + top_border  # Display height
 gameDisplay = pygame.display.set_mode((display_width, display_height))  # Create display
 timer = pygame.time.Clock()  # Create timer
 pygame.display.set_caption("Minesweeper")  # S Set the caption of window
+
+# Load sound effects
+click_sound = pygame.mixer.Sound("Sounds/click.mp3")
+explosion_sound = pygame.mixer.Sound("Sounds/explosion.wav")
+flag_sound = pygame.mixer.Sound("Sounds/flag.mp3")
+
+# Load background music
+pygame.mixer.music.load("Sounds/bgm.mp3")
+pygame.mixer.music.play(-1)  # Play music on loop
 
 # Import files
 spr_emptyGrid = pygame.image.load("Sprites/empty.png")
@@ -102,6 +113,7 @@ class Grid:
         self.clicked = True
         # Auto reveal if it's a 0
         if self.val == 0:
+            click_sound.play()
             for x in range(-1, 2):
                 if self.xGrid + x >= 0 and self.xGrid + x < game_width:
                     for y in range(-1, 2):
@@ -109,6 +121,7 @@ class Grid:
                             if not grid[self.yGrid + y][self.xGrid + x].clicked:
                                 grid[self.yGrid + y][self.xGrid + x].revealGrid()
         elif self.val == -1:
+            explosion_sound.play() # Play explosion
             # Auto reveal all mines if it's a mine
             for m in mines:
                 if not grid[m[1]][m[0]].clicked:
@@ -200,6 +213,7 @@ def gameLoop():
                                 elif event.button == 3:
                                     # If the player right clicked
                                     if not j.clicked:
+                                        flag_sound.play()
                                         if j.flag:
                                             j.flag = False
                                             mineLeft += 1
