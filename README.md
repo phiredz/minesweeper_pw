@@ -1,5 +1,7 @@
 # Minesweeper 🚩
 
+![game_screenshot](https://github.com/phiredz/minesweeper_pw/blob/main/minesweeper_screenshot.png)
+
 ## Source
 https://github.com/ixora-0/Minesweeper + code snippets to add SFX & BGM by Faiqah
 
@@ -9,6 +11,3 @@ Minesweeper is a logic puzzle where you uncover a grid of squares. Numbers tell 
 ## Controls
 - Click on a cell to reveal it
 - In order to flag a mine, right-click on the cell
-
-## Screenshots
-(ADD SCREENSHOT HERE)
