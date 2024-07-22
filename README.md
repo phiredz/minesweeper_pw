@@ -12,4 +12,4 @@ Minesweeper is a logic puzzle where you uncover a grid of squares. Numbers tell 
 1. Click on a cell to reveal it
 2. In order to flag a mine, right-click on the cell
 
-P.S. Play the 15 by 15 grid version. It's more fun.
+P.S. Play the 15 by 15 grid version cause it's more fun imo
