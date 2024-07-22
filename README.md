@@ -1,5 +1,7 @@
 # Minesweeper 🚩
 
+The 15 by 15 grid version is more fun. 
+
 ![game_screenshot](https://github.com/phiredz/minesweeper_pw/blob/main/minesweeper_screenshot.png)
 
 ## Source 🔍
@@ -11,3 +13,5 @@ Minesweeper is a logic puzzle where you uncover a grid of squares. Numbers tell 
 ## Controls 🎮
 1. Click on a cell to reveal it
 2. In order to flag a mine, right-click on the cell
+
+P.S.: Play the 15 by 15 grid version. It's more fun.
