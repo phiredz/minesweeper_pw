@@ -1,5 +1,5 @@
-# Modified code with BGM & SFX
-# Changed grid size & number of mines
+# Added BGM & SFX
+# Added Start Screen
 
 import pygame
 import random
@@ -8,10 +8,11 @@ pygame.init()
 bg_color = (192, 192, 192)
 grid_color = (128, 128, 128)
 
+game_state = "start_screen"
 game_width = 15  # Change this to increase size
 game_height = 15  # Change this to increase size
-numMine = 14  # Number of mines
-grid_size = 32  # Size of grid (WARNING: macke sure to change the images dimension as well)
+numMine = 30  # Number of mines
+grid_size = 32  # Size of grid (WARNING: make sure to change the images dimension as well)
 border = 16  # Top border
 top_border = 100  # Left, Right, Bottom border
 display_width = grid_size * game_width + border * 2  # Display width
@@ -46,11 +47,16 @@ spr_mine = pygame.image.load("Sprites/mine.png")
 spr_mineClicked = pygame.image.load("Sprites/mineClicked.png")
 spr_mineFalse = pygame.image.load("Sprites/mineFalse.png")
 
-
 # Create global values
 grid = []  # The main grid
 mines = []  # Pos of the mines
 
+# Start button dimensions
+button_width = 200
+button_height = 50
+button_x = (display_width - button_width) // 2
+button_y = (display_height - button_height) // 2
+start_button_rect = pygame.Rect(button_x, button_y, button_width, button_height)
 
 # Create funtion to draw texts
 def drawText(txt, s, yOff=0):
@@ -59,6 +65,38 @@ def drawText(txt, s, yOff=0):
     rect.center = (game_width * grid_size / 2 + border, game_height * grid_size / 2 + top_border + yOff)
     gameDisplay.blit(screen_text, rect)
 
+# Function to handle button clicks on the start screen
+def handle_start_button_click(pos):
+    # Add logic to check if the click position is within the button's rectangle
+    # If clicked, initiate the game loop
+    if start_button_rect.collidepoint(pos):
+        gameLoop()
+
+# Function to display the start screen
+def display_start_screen():
+    running = True
+    while running:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+                pygame.quit()
+                quit()
+            # Check for mouse click on start button
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                # If the click is not within the start button rect, ignore it
+                if not start_button_rect.collidepoint(event.pos):
+                    continue
+                
+                handle_start_button_click(event.pos)
+
+        # Draw background or start screen elements
+        gameDisplay.fill(bg_color)
+
+        # Draw start button (replace with image or text if desired)
+        pygame.draw.rect(gameDisplay, (0, 255, 0), start_button_rect)  # Green button
+        drawText("Start Game", 36, 10)  # Button text
+
+        pygame.display.update()
 
 # Create class grid
 class Grid:
@@ -257,7 +295,16 @@ def gameLoop():
 
         timer.tick(15)  # Tick fps
 
+while True:
+    if game_state == "start_screen":
+        display_start_screen()
+    elif game_state == "playing":
+        gameLoop()
+    else:
+        print("Invalid game state")
+        break
 
+display_start_screen()
 gameLoop()
 pygame.quit()
 quit()
