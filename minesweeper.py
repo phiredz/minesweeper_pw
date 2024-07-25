@@ -1,4 +1,4 @@
-# Modified code with BGM & SFX
+# Added BGM & SFX
 # Added Start Screen
 
 import pygame
